@@ -1,0 +1,82 @@
+---
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+- name: include OS-specfic setup 
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ensure folders exists.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+  with_items:
+      - "{{ svn_repository_home }}"
+      - "{{ svn_conf_dir }}"
+
+- name: Create user dirs
+  file: 
+    state: directory
+    path: "{{ svn_repository_home }}/{{ item.name }}"
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+  with_items:
+   - "{{ svn_users }}" 
+  when:
+    - (item.name != "admin")
+
+- name: Copy subversion configuration file.
+  template:
+    src: subversion.conf.j2
+    dest: "{{ svn_apache_conf_path }}/subversion.conf"
+    owner: root
+    group: root
+  notify: restart apache
+
+- name: Create a test repository.
+  command: >
+    svnadmin create testrepo
+    chdir={{ svn_repository_home }}
+    creates={{ svn_repository_home }}/testrepo/README.txt
+  when: svn_create_test_repo
+
+- name: enable svn users
+  htpasswd:
+    path: "{{ svn_conf_dir }}/authz"
+    name: "{{ item.name }}"
+    password: "{{ item.pw }}"
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+    mode: 0644
+  with_items:
+    - "{{ svn_users }}"
+
+- name: initialize repo(s)
+  command: "svnadmin create {{ item.name }}"
+  args:
+    chdir: "{{ svn_repository_home }}"
+    creates: "{{ svn_repository_home }}/{{ item.name }}/README.txt"
+  with_items:
+      - "{{ svn_users }}"
+  when:
+    - (item.name != "admin")
+
+- name: create authz file
+  template:
+    dest: "{{ svn_repository_home }}/authz"
+    src: authz.j2
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+    mode: 0644   
+  notify:
+    - restart svn
+
+- name: cleanup
+  file:
+    state: absent
+    dest: "{{ svn_apache_conf_path }}/{{ item }}"
+  with_items: 
+    - welcome.conf
+    - README
+    - autoindex.conf
+    - userdir.conf

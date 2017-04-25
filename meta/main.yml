@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: Georg Rabenstein
+  description: SVN web server for Linux
+  company: "Deposit Solutions"
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+      - all
+    - name: Debian
+      versions:
+      - all
+    - name: Ubuntu
+      versions:
+      - all
+  galaxy_tags:
+    - development
+    - svn
+    - subversion
+    - vcs

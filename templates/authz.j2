@@ -1,0 +1,18 @@
+[groups]
+{% for item in svn_users %}
+{% if item.name == "admin" %}
+admin={{ item.name }}
+{% else %}
+{{ item.name }}_user={{ item.name }}
+{% endif %}
+{% endfor %}
+
+[/]
+@admin=rw
+
+{% for item in svn_users %}
+{% if item.name != "admin" %}
+[{{ item.name }}:/]
+@{{ item.name }}=rw
+{% endif %}
+{% endfor %}

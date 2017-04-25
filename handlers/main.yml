@@ -1,0 +1,16 @@
+- name: start apache
+  systemd:
+    name: "{{ svn_apache_service }}"
+    state: started
+    enabled: yes
+
+- name: restart apache
+  systemd:
+    name: "{{ svn_apache_service }}"
+    state: restarted
+    enabled: yes
+    
+- name: restart svn
+  systemd:
+    name: svnserve
+    state: restarted

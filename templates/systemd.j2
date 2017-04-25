@@ -1,0 +1,17 @@
+[Unit]
+Description=SVN
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=forking
+PidFile=/var/run/svn.pid
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+User={{ svn_apache_user }}
+Group={{ svn_apache_user }}
+ExecStart=/usr/bin/svnserve --daemon -r {{ svn_repository_home }}
+
+[Install]
+WantedBy=multi-user.target

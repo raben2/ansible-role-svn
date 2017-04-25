@@ -1,0 +1,9 @@
+---
+svn_repository_home: /var/svn
+svn_conf_dir: /etc/svn
+svn_create_test_repo: true
+svn_users:
+  - name: admin
+    pw: s3cur3passwd
+  - name: user
+    pw: t3st

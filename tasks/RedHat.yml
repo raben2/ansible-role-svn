@@ -1,0 +1,19 @@
+- name: Ensure SVN packages are installed.
+  yum: "name={{ item }} state=installed"
+  with_items:
+    - httpd
+    - mod_dav_svn
+    - subversion
+    - python-passlib
+
+- name: create systemd service
+  template:
+    dest: /usr/lib/systemd/system/svnserve.service
+    src: systemd.j2
+
+- name: enable svn service
+  systemd:
+    name: svnserve
+    enabled: yes
+    daemon_reload: yes
+    state: started

@@ -1,0 +1,28 @@
+- name: Ensure SVN packages are installed (Debian).
+  apt: name={{ item }} state=installed
+  with_items:
+    - subversion
+    - libapache2-svn
+    - python-passlib
+  when: ansible_os_family == 'Debian'
+
+- name: Create init script for svnserve (Debian).
+  copy:
+    src: svnserve
+    dest: /etc/init.d/svnserve
+    mode: 0755
+  when: ansible_os_family == 'Debian'
+  register: svn_init_copy
+
+# Workaround for bug https://github.com/ansible/ansible-modules-core/issues/915.
+- name: Run systemd daemon_reload (Ubuntu/Debian workaround).
+  systemd:
+    name: svnserve
+    daemon_reload: yes
+  when: >
+    (svn_init_copy.changed)
+    and ansible_os_family == 'Debian'
+    and "ansible_service_mgr == 'systemd'"
+
+- name: Ensure SVN is started.
+  service: name=svnserve state=started enabled=yes
