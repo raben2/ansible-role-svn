@@ -13,17 +13,7 @@
   with_items:
       - "{{ svn_repository_home }}"
       - "{{ svn_conf_dir }}"
-
-- name: Create user dirs
-  file: 
-    state: directory
-    path: "{{ svn_repository_home }}/{{ item.name }}"
-    owner: "{{ svn_apache_user }}"
-    group: "{{ svn_apache_user }}"
-  with_items:
-   - "{{ svn_users }}" 
-  when:
-    - (item.name != "admin")
+      - "{{ svn_repository_home }}/config"
 
 - name: Copy subversion configuration file.
   template:
@@ -61,13 +51,39 @@
   when:
     - (item.name != "admin")
 
+- name: Create user dirs
+  file: 
+    state: directory
+    path: "{{ svn_repository_home }}/{{ item.name }}"
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+    recurse: yes
+  with_items:
+   - "{{ svn_users }}" 
+  when:
+    - (item.name != "admin")
+
 - name: create authz file
   template:
-    dest: "{{ svn_repository_home }}/authz"
+    dest: "{{ svn_repository_home }}/config/authz"
     src: authz.j2
     owner: "{{ svn_apache_user }}"
     group: "{{ svn_apache_user }}"
     mode: 0644   
+- name: create passwd file
+  template:
+    dest: "{{ svn_repository_home }}/config/passwd"
+    src: passwd.j2
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+    mode: 0644
+- name: create svnserv.conf file
+  template:
+    dest: "{{ svn_repository_home }}/config/svnserve.conf"
+    src: svnserve.j2
+    owner: "{{ svn_apache_user }}"
+    group: "{{ svn_apache_user }}"
+    mode: 0644 
   notify:
     - restart svn
 

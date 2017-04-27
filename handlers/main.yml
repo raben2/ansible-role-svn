@@ -14,3 +14,10 @@
   systemd:
     name: svnserve
     state: restarted
+    
+- name: enable svnserve
+  systemd:
+    name: svnserve
+    enabled: yes
+    daemon_reload: yes
+    state: started

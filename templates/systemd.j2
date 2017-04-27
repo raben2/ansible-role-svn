@@ -11,7 +11,7 @@ StandardOutput=journal
 StandardError=journal
 User={{ svn_apache_user }}
 Group={{ svn_apache_user }}
-ExecStart=/usr/bin/svnserve --daemon -r {{ svn_repository_home }}
+ExecStart=/usr/bin/svnserve --daemon -r {{ svn_repository_home }} --config-file={{ svn_repository_home }}/config/svnserve.conf --log-file=/data/svn/svn.log
 
 [Install]
 WantedBy=multi-user.target

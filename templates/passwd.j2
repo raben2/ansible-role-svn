@@ -1,0 +1,4 @@
+[users]
+{% for item in svn_users %}
+{{ item.name }}={{ item.pw }}
+{% endfor %}

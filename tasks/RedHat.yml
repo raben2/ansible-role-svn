@@ -10,10 +10,6 @@
   template:
     dest: /usr/lib/systemd/system/svnserve.service
     src: systemd.j2
+  notify:
+    - enable svnserve
 
-- name: enable svn service
-  systemd:
-    name: svnserve
-    enabled: yes
-    daemon_reload: yes
-    state: started
